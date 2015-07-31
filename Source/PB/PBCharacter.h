@@ -1,0 +1,70 @@
+// Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
+#pragma once
+#include "GameFramework/Character.h"
+#include "PBCharacter.generated.h"
+
+UCLASS(config=Game)
+class APBCharacter : public ACharacter
+{
+	GENERATED_BODY()
+
+	/** Side view camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* SideViewCameraComponent;
+
+	/** Camera boom positioning the camera beside the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom;
+    
+    
+
+protected:
+
+	/** Called for side to side input */
+	void MoveRight(float Val);
+
+	/** Handle touch inputs. */
+	void TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location);
+
+	/** Handle touch stop event. */
+	void TouchStopped(const ETouchIndex::Type FingerIndex, const FVector Location);
+
+	// APawn interface
+	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+	// End of APawn interface
+    
+    int jumpCounter;
+    int jumpCountTop;
+    bool isDashing;
+    float dashTiming;
+    class MovementState* currentState;
+    
+    void Jump();
+    void StopJumping();
+    bool CanJumpInternal_Implementation() const;
+    void Landed(const FHitResult& Hit);
+    void Dash();
+    void StopDashing();
+    void Tick(float deltaTime) override;
+    
+
+
+public:
+	APBCharacter();
+    
+    enum eMovementState
+    {
+        idle,
+        walking,
+        jumping,
+        dashing,
+        falling
+    };
+    eMovementState eCurrentState;
+    
+
+	/** Returns SideViewCameraComponent subobject **/
+	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+};
